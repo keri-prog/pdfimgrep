@@ -1,10 +1,9 @@
 import io
 import json
 import cv2
-import numpy as np
 import requests
 
-api_key = open("key.txt", 'r').read()
+api_key = open("./utils/key.txt", 'r').read()
 
 
 def parse_image(filepath: str):
@@ -24,13 +23,14 @@ def parse_image(filepath: str):
     file_bytes = io.BytesIO(compressedimage)
 
     result = requests.post(url_api,
-              files = {"screenshot.jpg": file_bytes},
-              data = {"apikey": api_key,
-                      "language": "eng"})
+                           files={"screenshot.jpg": file_bytes},
+                           data={"apikey": api_key,
+                                 "language": "eng"})
     result = result.content.decode()
     result = json.loads(result)
 
     parsed_results = result.get("ParsedResults")[0]
     text_detected = parsed_results.get("ParsedText")
-    
+
     return text_detected
+    

@@ -1,4 +1,6 @@
+import imp
 import click
+from utils.clifunc import pdf_to_text, display_grep
 
 @click.command()
 @click.argument('filename')
