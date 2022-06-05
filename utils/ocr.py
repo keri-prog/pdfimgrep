@@ -6,14 +6,14 @@ import requests
 api_key = open("./utils/key.txt", 'r').read()
 
 
-def parse_image(filepath: str):
-    """_summary_
+def parse_image(filepath: str) -> str:
+    """parses the given image and returns the text read from it
 
     Args:
-        filepath (str): filepath of the file to be read 
+        filepath (str): path of the file to be scanned
 
     Returns:
-        _type_: _description_
+        str: text extracted from the given image
     """
     img = cv2.imread(filepath)
     height, width, _ = img.shape
@@ -33,4 +33,3 @@ def parse_image(filepath: str):
     text_detected = parsed_results.get("ParsedText")
 
     return text_detected
-    

@@ -1,4 +1,5 @@
 import re
+import os
 import tempfile
 from pdf2image import convert_from_path
 from rich import print
@@ -6,15 +7,15 @@ from rich.progress import track
 from .ocr import parse_image
 
 
-def grep_all(filepath: str, pattern: str):
-    """_summary_
+def grep_all(filepath: str, pattern: str) -> str:
+    """returns all the lines containing the given pattern
 
     Args:
-        filepath (str): _description_
-        pattern (str): _description_
+        filepath (str): path of the file to be scanned
+        pattern (str): regex pattern to be searched in the given file
 
     Returns:
-        _type_: _description_
+        str: string made up of lines matching the pattern
     """
     grep_list = []
     images = convert_from_path(filepath)
@@ -33,15 +34,15 @@ def grep_all(filepath: str, pattern: str):
     return grep_str
 
 
-def find(text: str, pattern: str):
-    """_summary_
+def find(text: str, pattern: str) -> list:
+    """returns a list of dictionary containing line number and the matched line 
 
     Args:
-        text (str): _description_
-        pattern (str): _description_
+        text (str): text to be searched for the pattern
+        pattern (str): regex pattern to be searched in the given text
 
     Returns:
-        _type_: _description_
+        list: list of dictionary containing line number and the matched line 
     """
     occurances = []
     for lno, line in enumerate(text.split('\n')):
@@ -53,11 +54,11 @@ def find(text: str, pattern: str):
 
 
 def display_location(filepath: str, pattern: str):
-    """_summary_
+    """displays the line number 
 
     Args:
-        filepath (str): _description_
-        pattern (str): _description_
+        filepath (str): path of the file to be scanned
+        pattern (str): regex pattern to be searched in the given file
     """
     images = convert_from_path(filepath)
 
@@ -72,7 +73,8 @@ def display_location(filepath: str, pattern: str):
             for occurance in occurances:
                 line_num = occurance["lno"]
                 line_list = re.split(f'({pattern})', occurance["line"])
-                line_list[1] = "[bold green on blue]" + f"{line_list[1]}"+ "[/bold green on blue]"
+                line_list[1] = "[bold green on blue]" + \
+                    f"{line_list[1]}" + "[/bold green on blue]"
                 line = ''.join(line_list)
                 print(line_num + line)
 
@@ -80,21 +82,20 @@ def display_location(filepath: str, pattern: str):
 
 
 def pdf_to_text(filepath: str, pattern: str):
-    """_summary_
+    """converts pdf file to text file
 
     Args:
-        filepath (str): _description_
-        pattern (str): _description_
+        filepath (str): path of the file to be scanned
+        pattern (str): regex pattern to be searched in the given file
     """
     images = convert_from_path(filepath)
-    f = open(filepath.split('.')[0] + '-text.txt', 'w')
+    f = open(os.path.splitext(filepath)[0] + '-text.txt', 'w')
 
     for i in range(len(images)):
         temp = tempfile.NamedTemporaryFile()
         images[i].save(temp.name, 'JPEG')
-        text = parse_image(temp.name, pattern)
+        text = parse_image(temp.name)
         f.write(f"Page {i+1}\n\n" + text)
         temp.close()
 
     f.close()
-
