@@ -1,4 +1,3 @@
-from gettext import install
 import imp
 from importlib.metadata import entry_points
 from setuptools import setup, find_packages
